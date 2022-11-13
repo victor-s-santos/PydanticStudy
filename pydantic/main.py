@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from datetime import date
 from bson import ObjectId
 from enum import Enum
@@ -16,9 +16,19 @@ class User(BaseModel):
     created_at: date
     permission_level: PermissionLevel
 
+    @validator("created_at")
+    def validate_date(cls, created_at):
+        if created_at.year > date.today().year:
+            raise ValueError("Year must be lass than or equal to current year!")
+        created_at
 
-user = User(
+
+valid_user = User(
     name="Victor", created_at=date.today(), permission_level=PermissionLevel.SUPERUSER
 )
-print(user, type(user))
-print(user.name)
+
+invalid_user = User(
+    name="Victor", created_at=date(2045, 11, 13), permission_level=PermissionLevel.SUPERUSER
+)
+
+
